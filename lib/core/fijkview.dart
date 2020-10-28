@@ -30,17 +30,13 @@ part of fijkplayer;
 /// The return widget is placed as one of [Stack]'s children.
 /// If change FijkView between normal mode and full screen mode, the panel would
 /// be rebuild. [data] can be used to pass value from different panel.
-typedef FijkPanelWidgetBuilder = Widget Function(FijkPlayer player,
-    FijkData data, BuildContext context, Size viewSize, Rect texturePos);
+typedef FijkPanelWidgetBuilder = Widget Function(FijkPlayer player, FijkData data, BuildContext context, Size viewSize, Rect texturePos);
 
 /// How a video should be inscribed into [FijkView].
 ///
 /// See also [BoxFit]
 class FijkFit {
-  const FijkFit(
-      {this.alignment = Alignment.center,
-      this.aspectRatio = -1,
-      this.sizeFactor = 1.0})
+  const FijkFit({this.alignment = Alignment.center, this.aspectRatio = -1, this.sizeFactor = 1.0})
       : assert(alignment != null),
         assert(sizeFactor != null);
 
@@ -261,8 +257,7 @@ class _FijkViewState extends State<FijkView> {
     }
   }
 
-  AnimatedWidget _defaultRoutePageBuilder(
-      BuildContext context, Animation<double> animation) {
+  AnimatedWidget _defaultRoutePageBuilder(BuildContext context, Animation<double> animation) {
     return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget child) {
@@ -279,8 +274,7 @@ class _FijkViewState extends State<FijkView> {
     );
   }
 
-  Widget _fullScreenRoutePageBuilder(BuildContext context,
-      Animation<double> animation, Animation<double> secondaryAnimation) {
+  Widget _fullScreenRoutePageBuilder(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
     return _defaultRoutePageBuilder(context, animation);
   }
 
@@ -295,19 +289,16 @@ class _FijkViewState extends State<FijkView> {
     var orientation = MediaQuery.of(context).orientation;
     FijkLog.d("start enter fullscreen. orientation:$orientation");
     if (_vWidth >= _vHeight) {
-      if (MediaQuery.of(context).orientation == Orientation.portrait)
-        changed = await FijkPlugin.setOrientationLandscape();
+      if (MediaQuery.of(context).orientation == Orientation.portrait) changed = await FijkPlugin.setOrientationLandscape();
     } else {
-      if (MediaQuery.of(context).orientation == Orientation.landscape)
-        changed = await FijkPlugin.setOrientationPortrait();
+      if (MediaQuery.of(context).orientation == Orientation.landscape) changed = await FijkPlugin.setOrientationPortrait();
     }
     FijkLog.d("screen orientation changed:$changed");
 
     await Navigator.of(context).push(route);
     _fullScreen = false;
     widget.player.exitFullScreen();
-    await SystemChrome.setEnabledSystemUIOverlays(
-        [SystemUiOverlay.top, SystemUiOverlay.bottom]);
+    await SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top, SystemUiOverlay.bottom]);
     if (changed) {
       if (_vWidth >= _vHeight) {
         await FijkPlugin.setOrientationPortrait();
@@ -470,12 +461,10 @@ class __InnerFijkViewState extends State<_InnerFijkView> {
 
   /// calculate Texture size
   Size getTxSize(BoxConstraints constraints, FijkFit fit) {
-    Size childSize = applyAspectRatio(
-        constraints, getAspectRatio(constraints, fit.aspectRatio));
+    Size childSize = applyAspectRatio(constraints, getAspectRatio(constraints, fit.aspectRatio));
     double sizeFactor = fit.sizeFactor;
     if (-1.0 < sizeFactor && sizeFactor < -0.0) {
-      sizeFactor = max(constraints.maxWidth / childSize.width,
-          constraints.maxHeight / childSize.height);
+      sizeFactor = max(constraints.maxWidth / childSize.width, constraints.maxHeight / childSize.height);
     } else if (-2.0 < sizeFactor && sizeFactor < -1.0) {
       sizeFactor = constraints.maxWidth / childSize.width;
     } else if (-3.0 < sizeFactor && sizeFactor < -2.0) {
@@ -531,8 +520,7 @@ class __InnerFijkViewState extends State<_InnerFijkView> {
       // get child size
       final Size childSize = getTxSize(constraints, _fit);
       final Offset offset = getTxOffset(constraints, childSize, _fit);
-      final Rect pos = Rect.fromLTWH(
-          offset.dx, offset.dy, childSize.width, childSize.height);
+      final Rect pos = Rect.fromLTWH(offset.dx, offset.dy, childSize.width, childSize.height);
 
       List ws = <Widget>[
         Container(
@@ -547,13 +535,17 @@ class __InnerFijkViewState extends State<_InnerFijkView> {
               child: buildTexture(),
             )),
       ];
-
+      MediaQueryData mediaQuery = MediaQuery.of(context);
       if (widget.cover != null && !value.videoRenderStart) {
-        ws.add(Positioned.fromRect(
-          rect: pos,
-          child: Image(
-            image: widget.cover,
-            fit: BoxFit.fill,
+        ws.add(Container(
+          width: mediaQuery.size.width,
+          height: mediaQuery.size.height,
+          child: Center(
+            child: Image(
+              image: widget.cover,
+              width: mediaQuery.size.width,
+              fit: BoxFit.fitWidth,
+            ),
           ),
         ));
       }
